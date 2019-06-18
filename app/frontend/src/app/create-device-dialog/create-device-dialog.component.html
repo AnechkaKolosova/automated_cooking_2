@@ -1,28 +1,14 @@
 <h1 mat-dialog-title>Have a new device?</h1>
 <div mat-dialog-content>
-  <mat-horizontal-stepper>
-    <mat-step [stepControl]="newDevice">
-      <form [formGroup]="newDevice" (ngSubmit)="onSubmit()">
-        <ng-template matStepLabel>Fill description of you new device</ng-template>
-        <mat-form-field>
-          <textarea matInput formControlName="description" placeholder="This is a sous-vide for fish"></textarea>
-        </mat-form-field>
-        <div>
-          <button mat-button matStepperNext [disabled]="newDevice.invalid" type="submit">Next</button>
-        </div>
-      </form>
-    </mat-step>
-    <mat-step>
-      <ng-template matStepLabel>Press a connect button on your device</ng-template>
-      <div>
-        <button mat-button matStepperNext type="submit">Done</button>
-      </div>
-    </mat-step>
-    <mat-step>
-      <ng-template matStepLabel>Please wait while we connect your device</ng-template>
-      <mat-progress-bar mode="buffer"></mat-progress-bar>
-    </mat-step>
-  </mat-horizontal-stepper>
+  <form [formGroup]="newDevice" (ngSubmit)="onSubmit()">
+    <ng-template matStepLabel>Fill description of you new device</ng-template>
+    <mat-form-field>
+      <textarea matInput formControlName="description" placeholder="This is a device for ..."></textarea>
+    </mat-form-field>
+    <div>
+      <button mat-button [disabled]="newDevice.invalid" type="submit">Create</button>
+    </div>
+  </form>
 </div>
 
 

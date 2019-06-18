@@ -16,38 +16,6 @@ export class DeviceComponent implements OnInit {
   constructor(public dialog: MatDialog, private alertService: AlertService) {
   }
 
-  get timer() {
-    if (this.device.timestamp) {
-      const created = new Date(this.device.timestamp);
-      return new Date(created.getTime() + this.device.time * 60000).getTime();
-    }
-    return;
-  }
-
-  onCompleted() {
-    this.device.time = undefined;
-    this.device.timestamp = undefined;
-    this.device.targetTemp = undefined;
-    this.device.status = 'off';
-    this.alertService.success('Cooking finished successfully!');
-  }
-
-  openDialog(): void {
-    const dialogRef = this.dialog.open(DeviceSetTemperatureComponent, {
-      width: '250px',
-      data: {device: this.device.id, temp: this.device.temp}
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.device.timestamp = result.currentTime;
-        this.device.targetTemp = result.targetTemp;
-        this.device.time = result.timer;
-        this.device.status = "on";
-      }
-    });
-  }
-
   ngOnInit() {
   }
 

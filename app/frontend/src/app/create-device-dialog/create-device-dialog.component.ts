@@ -26,7 +26,6 @@ export class CreateDeviceDialogComponent implements OnInit, OnDestroy {
     private deviceService: DeviceService,
     private alertService: AlertService,
     @Inject(MAT_DIALOG_DATA) public data: any,
-    private notificationService: NotificationService
   ) {
     this.newDevice = this.formBuilder.group({
       description: ['', Validators.required]
@@ -46,23 +45,15 @@ export class CreateDeviceDialogComponent implements OnInit, OnDestroy {
       .subscribe(
         data => {
           this.savedDevice = data;
-          this.notificationService.sendMsg({
-            type: 'connect',
-            device: this.savedDevice.id,
-          });
+          this.dialogRef.close(this.savedDevice);
         },
         error => {
           this.alertService.error(error);
+          this.dialogRef.close();
         });
   }
 
   ngOnInit() {
-    this.subscription = this.notificationService.messages.subscribe(msg => {
-      if (msg.type === 'connected' && this.savedDevice !== undefined) {
-        this.savedDevice.connected = true;
-        this.dialogRef.close(this.savedDevice);
-      }
-    });
   }
 
   ngOnDestroy(): void {

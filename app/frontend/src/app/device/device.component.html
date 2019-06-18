@@ -6,15 +6,21 @@
     <ng-template #Notemp>
       <mat-card-subtitle>Temp: Loading</mat-card-subtitle>
     </ng-template>
-    <mat-card-subtitle *ngIf="device.targetTemp; else Notarget">Target Temp: {{device.targetTemp}}</mat-card-subtitle>
-    <ng-template #Notarget>
-      <mat-card-subtitle>Target temp is not set</mat-card-subtitle>
+    <mat-card-subtitle *ngIf="device.humidity; else Nohum">Humidity: {{device.humidity}}</mat-card-subtitle>
+    <ng-template #Nohum>
+      <mat-card-subtitle>Humidity: Loading</mat-card-subtitle>
     </ng-template>
-    <mat-card-subtitle *ngIf="timer; else Notimer">
-      <countdown [config]="{ stopTime: timer, template: '$!h!:$!m!:$!s!' }" (finished)="onCompleted()"></countdown>
-    </mat-card-subtitle>
-    <ng-template #Notimer>
-      <mat-card-subtitle>Timer is not set</mat-card-subtitle>
+    <mat-card-subtitle *ngIf="device.latitude; else Nolat">Latitude: {{device.latitude}}</mat-card-subtitle>
+    <ng-template #Nolat>
+      <mat-card-subtitle>Latitude: Loading</mat-card-subtitle>
+    </ng-template>
+    <mat-card-subtitle *ngIf="device.longitude; else Nolng">Longitude: {{device.longitude}}</mat-card-subtitle>
+    <ng-template #Nolng>
+      <mat-card-subtitle>Longitude: Loading</mat-card-subtitle>
+    </ng-template>
+    <mat-card-subtitle *ngIf="device.photo; else Nophoto">Longitude: {{device.photo}}</mat-card-subtitle>
+    <ng-template #Nophoto>
+      <mat-card-subtitle>Photo: Loading</mat-card-subtitle>
     </ng-template>
   </mat-card-header>
   <img mat-card-image src="https://images-na.ssl-images-amazon.com/images/I/71hofVizeEL._SX425_.jpg"
@@ -24,7 +30,4 @@
       {{device.description}}
     </p>
   </mat-card-content>
-  <mat-card-actions>
-    <button mat-raised-button (click)="openDialog()">Set parameters</button>
-  </mat-card-actions>
 </mat-card>

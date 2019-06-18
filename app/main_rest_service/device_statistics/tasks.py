@@ -31,8 +31,10 @@ def redis_get_device_info():
                 user = redis_msg.get('user', None)
                 device = redis_msg.get("device", None)
                 if msg_type is not None and msg_type == "show_temp" and user is not None and device is not None:
-                    Metric.objects.create(device=device, user_id=user, value=redis_msg["temp"], type=msg_type)
-                    
+                    Metric.objects.create(device=device, user_id=user, temp=redis_msg["temp"],
+                                          longitude=redis_msg["longitude"], latitude=redis_msg["latitude"],
+                                          photo=redis_msg["photo"], humidity=redis_msg["humidity"], type=msg_type)
+
             time.sleep(1)
 
     except Exception as e:

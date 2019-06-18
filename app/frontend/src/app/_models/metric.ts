@@ -1,7 +1,11 @@
 export interface Metric {
   type: string;
-  value: number;
   device: number;
   user: number;
   dt: string;
+  temp: number;
+  photo: string;
+  longitude: number;
+  latitude: number;
+  humidity: number;
 }

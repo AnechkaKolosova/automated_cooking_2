@@ -30,15 +30,14 @@ export class DeviceListComponent implements OnInit {
         return dv.id === msg.device;
       });
       if (foundDevice) {
-        switch (msg.type) {
-          case 'show_temp':
-            foundDevice.temp = msg.temp;
-            break;
-          case 'connected':
-            foundDevice.connected = true;
-            break;
-          default:
-            break;
+        if (msg.type === 'show_temp') {
+          foundDevice.temp = msg.temp;
+          foundDevice.photo = msg.photo;
+          foundDevice.longitude = msg.longitude;
+          foundDevice.latitude = msg.latitude;
+          foundDevice.humidity = msg.humidity;
+        } else {
+          console.log('Unknown msg');
         }
       }
     });

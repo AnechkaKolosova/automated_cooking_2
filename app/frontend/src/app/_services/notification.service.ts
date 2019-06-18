@@ -22,7 +22,11 @@ export class NotificationService {
         return {
           type: data.type,
           device: data.device,
-          temp: data.temp
+          temp: data.temp,
+          photo: data.photo,
+          latitude: data.latitude,
+          longitude: data.longitude,
+          humidity: data.humidity
         };
       }), share());
   }

@@ -112,7 +112,7 @@
   "I don't do a whole lot."
   [& args]
   (let [server1-conn {:pool {} :spec {:uri "redis://redis:6379"}}
-        devices (atom {1 (Device. 1 99999 ["smuggler_00002"] 40)})
+        devices (atom {1 (Device. 1 1 ["smuggler_00002"] 40)})
         redis-sub (chan)
         mqtt-sub (chan)
         mqtt-pub (chan)

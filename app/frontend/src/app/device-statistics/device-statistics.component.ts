@@ -17,7 +17,8 @@ export class DeviceStatisticsComponent implements OnInit, OnDestroy {
   title = 'stats';
   data: Metric[];
   time = [];
-  metric = [];
+  hum = [];
+  temp = [];
   chart: Chart;
   private subscription: Subscription;
 
@@ -36,14 +37,19 @@ export class DeviceStatisticsComponent implements OnInit, OnDestroy {
         if (this.time.length > 20) {
           this.time.shift();
         }
-        if (this.metric.length > 20) {
-          this.metric.shift();
+        if (this.hum.length > 20) {
+          this.hum.shift();
+        }
+        if (this.temp.length > 20) {
+          this.temp.shift();
         }
         this.time.push(new Date(metric.dt).getMinutes());
-        this.metric.push(metric.value);
+        this.hum.push(metric.humidity);
+        this.temp.push(metric.temp);
       });
       console.log(this.time);
-      console.log(this.metric);
+      console.log(this.hum);
+      console.log(this.temp);
       interval(2000).pipe(take(2)).subscribe(() => {
         this.chart = new Chart('canvas', {
           type: 'line',
@@ -51,10 +57,19 @@ export class DeviceStatisticsComponent implements OnInit, OnDestroy {
             labels: this.time,
             datasets: [
               {
-                data: this.metric,
-                borderColor: '#3cba9f',
+                label: 'temperature',
+                yAxisID: 'temperature',
+                data: this.temp,
+                borderColor: '#44ba3c',
                 fill: false
-              }
+              },
+              {
+                label: 'humidity',
+                yAxisID: 'humidity',
+                data: this.hum,
+                borderColor: '#4d81ba',
+                fill: false
+              },
             ]
           },
           options: {
@@ -66,8 +81,21 @@ export class DeviceStatisticsComponent implements OnInit, OnDestroy {
                 display: true
               }],
               yAxes: [{
+                id: 'temperature',
+                type: 'linear',
+                position: 'left',
                 display: true
-              }],
+              },
+                {
+                  id: 'humidity',
+                  type: 'linear',
+                  position: 'right',
+                  ticks: {
+                    max: 1,
+                    min: 0
+                  },
+                  display: true
+                }],
             }
           }
         });
@@ -75,26 +103,20 @@ export class DeviceStatisticsComponent implements OnInit, OnDestroy {
     });
     this.subscription = interval(10000).pipe(switchMap(() => this.statService.getLatestStat())).subscribe(metrics => {
       const metric = metrics[0];
-      let updTime = false;
-      let updVal = false;
       if (metric) {
         if (this.time.length > 20) {
           this.time.shift();
         }
-        if (this.metric.length > 20) {
-          this.metric.shift();
+        if (this.hum.length > 20) {
+          this.hum.shift();
+        }
+        if (this.temp.length > 20) {
+          this.temp.shift();
         }
         if (this.time[this.time.length - 1] !== new Date(metric.dt)) {
           this.time.push(new Date(metric.dt).getMinutes());
-          updTime = true;
         }
-        if (this.metric[this.metric.length - 1] !== metric.value) {
-          this.metric.push(metric.value);
-          updVal = true;
-        }
-        if (updTime && updVal) {
-          this.chart.update();
-        }
+        this.chart.update();
       }
     });
 
