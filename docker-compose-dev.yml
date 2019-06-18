@@ -16,7 +16,7 @@ services:
       - "./app/frontend:/app"
     command: /bin/sh -c "npm install && npm install -g @angular/cli && ng serve --host 0.0.0.0 --disable-host-check"
     ports:
-      - "4200:4200"
+      - "4201:4201"
 
   django:
     build:
@@ -30,7 +30,7 @@ services:
       - db
       - redis
     ports:
-      - "3000:3000"
+      - "3001:3001"
     environment:
       - 'SECRET=$sc7z*$mub!&n6ppy6x&c$irlk84=#5i-7jqm)xyj@=qd=nnf1'
 
@@ -49,7 +49,7 @@ services:
     depends_on:
       - redis
     ports:
-      - "8080:8080"
+      - "8081:8081"
 
   sous_vide:
     image: clojure:latest
@@ -60,7 +60,7 @@ services:
       - redis
       - mosquitto
     ports:
-      - "7888:7888"
+      - "7889:7889"
     command: /bin/bash -c "lein run"
 #    command: lein repl :headless :host 0.0.0.0 :port 7888
 

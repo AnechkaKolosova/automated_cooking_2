@@ -4,9 +4,9 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'http://home.korotach.com:3000/api',
-  wsUrl: 'ws://home.korotach.com:8080/ws',
-  deviceUrl: 'http://home.korotach.com:8080'
+  apiUrl: 'http://home.korotach.com:3001/api',
+  wsUrl: 'ws://home.korotach.com:8081/ws',
+  deviceUrl: 'http://home.korotach.com:8081'
 };
 
 /*
