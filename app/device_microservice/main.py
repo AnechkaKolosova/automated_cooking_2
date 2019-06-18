@@ -19,8 +19,6 @@ from starlette.requests import Request
 from starlette.websockets import WebSocket, WebSocketDisconnect
 from starlette.middleware.cors import CORSMiddleware
 
-from data_types import ChangeParams
-
 app = FastAPI()
 app.add_middleware(CORSMiddleware,
                    allow_origins=['*'],
@@ -66,40 +64,8 @@ class DeviceManager:
             if connection is None:
                 raise Exception("Unable to perform update on selected device, it couldn't be found")
             await connection.send_json(
-                {"type": self.msg_type, "device": self.device_id, "temp": self.extra["temp"]})
-
-        elif self.msg_type == "connected":
-            query = devices.update().where(devices.c.user == self.user).values(connected=True)
-            await database.execute(query)
-            await connection.send_json(
-                {"type": self.msg_type, "device": self.device_id}
-            )
-            pub.publish_json('connections',
-                             {"user": self.user, "device": self.device_id, "device_delta": {"connected": True}})
-
-    async def perform_update(self):
-
-        if self.msg_type == "connect":
-            print("Trying to connect", flush=True)
-            pub.publish_json('sous-vide', {"type": self.msg_type, "device": self.device_id, "user": self.user})
-
-        elif self.msg_type == "set_temp":
-            if self.extra["temp"] == 0:
-                print(f"Setting device {self.device_id} to off")
-                query = devices.update().where(devices.c.user == self.user and devices.c.id == self.device_id).values(
-                    status="off", time=None, targetTemp=None, timestamp=None)
-                await database.execute(query)
-                pub.publish_json('connections',
-                                 {"user": self.user, "device": self.device_id, "device_delta": {"status": "off"}})
-            else:
-                print(f"Setting device {self.device_id} to on")
-                query = devices.update().where(devices.c.user == self.user and devices.c.id == self.device_id).values(
-                    status="on")
-                await database.execute(query)
-                pub.publish_json('connections',
-                                 {"user": self.user, "device": self.device_id, "device_delta": {"status": "on"}})
-            pub.publish_json('sous-vide', {"type": self.msg_type, "device": self.device_id, "user": self.user,
-                                           "temp": self.extra["temp"]})
+                {"type": self.msg_type, "device": self.device_id, "temp": self.extra["temp"],
+                 "photo": self.extra["photo"], "longitude": self.extra["longitude"], "latitude": self.extra["latitude"], "humidity": self.extra["humidity"]})
 
 
 async def reader(mpsc: Receiver):
@@ -163,21 +129,6 @@ async def shutdown():
     await pub.close()
 
 
-async def stop_device(user_id: int, device_id: int, time_sleep_min: int):
-    await asyncio.sleep(time_sleep_min * 60)
-    print("Stopping device", flush=True)
-    device_manager = DeviceManager(user_id, device_id, "set_temp", {"temp": 0})
-    await device_manager.perform_update()
-
-
-@app.patch("/devices/{item_id}")
-async def patch_device(*, request: Request, item_id: int, change_params: ChangeParams, background_tasks: BackgroundTasks):
-    query = devices.update().where(devices.c.user == request.user.display_name and devices.c.id == item_id).values(
-        time=change_params.time, timestamp=change_params.current_time, targetTemp=change_params.targetTemp)
-    await database.execute(query)
-    background_tasks.add_task(stop_device, request.user.display_name, item_id, change_params.time)
-
-
 @app.get("/devices/", response_model=List[Device])
 async def read_devices(request: Request):
     query = devices.select().where(devices.c.user == request.user.display_name)
@@ -187,10 +138,10 @@ async def read_devices(request: Request):
 @app.post("/devices/", response_model=Device, status_code=201)
 async def create_device(request: Request, device: DeviceRequest):
     query = devices.insert().values(description=device.description, status="off",
-                                    user=request.user.display_name, connected=False)
+                                    user=request.user.display_name)
     record_id = await database.execute(query)
     dv: Device = Device(id=record_id, description=device.description, status="off",
-                        user=request.user.display_name, connected=False)
+                        user=request.user.display_name)
     pub.publish_json('connections', {"user": request.user.display_name, "device": dv.json()})
     return {**dv.dict(), "id": record_id}
 
@@ -238,17 +189,10 @@ async def websocket_endpoint(websocket: WebSocket):
         query = devices.select().where(devices.c.user == user_id)
         user_devices: List[Device] = []
         for dv in await database.fetch_all(query):
-            user_devices.append(Device(id=dv[0], description=dv[1], status=dv[2], user=dv[3], connected=dv[4]))
+            user_devices.append(Device(id=dv[0], description=dv[1], status=dv[2], user=dv[3]))
         connections.append((user_id, websocket, user_devices))
         while True:
-            ws_msg = await websocket.receive_json()
-            user = user_id
-            msg_type = ws_msg.get("type", None)
-            device_id = ws_msg.get("device", None)
-            if user is None or device_id is None or msg_type is None:
-                raise Exception(f"Corrupted request from websocket {ws_msg}")
-            device_manager = DeviceManager(user_id, device_id, msg_type, ws_msg)
-            await device_manager.perform_update()
+            await websocket.receive_json()
 
     except WebSocketDisconnect:
         discard_connection(user_id)

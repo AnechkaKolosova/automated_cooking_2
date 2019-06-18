@@ -83,17 +83,25 @@
   ([ch msg device user]
    (go (>! ch (json/write-str {"user" user, "device" device, "type" "show_temp", "temp" msg})))))
 
+(defn send-redis-msg
+  [ch msg user device]
+  (let [photo (:photo msg)
+        temp (:temperature_C msg)
+        humidity (:humidity_% msg)
+        latitude (:latitude msg)
+        longitude (:longitude msg)]
+    (go (>! ch (json/write-str {"type" "show_temp", "user" user, "device" device, "latitude" latitude, "longitude" longitude, "humidity" humidity, "temp" temp, "photo" photo})))))
+
 (defn handle-mqtt-msg
   [topic payload user-device mqtt-pub-chan redis-pub-chan]
-  (let [msg (convert-msg payload)
+  (let [msg (parse-msg payload)
         device (find-device topic user-device)]
     (case topic
-      "test/temp"
+      "smuggler_00002"
       (cond
-        (= (:user device) 99999) (process-mqtt-temp mqtt-pub-chan msg "device_ctl" (:temp device))
+        (= (:user device) 99999) ()
         :else (do
-                (process-mqtt-temp mqtt-pub-chan msg "device_ctl" (:temp device))
-                (send-redis-temp redis-pub-chan msg (:id device) (:user device))))
+                (send-redis-msg redis-pub-chan msg (:user device) (:id device))))
       "keyUp"
       (case msg
         0 (go (>! redis-pub-chan (json/write-str {"user" (:user device), "device" (:id device), "type" "connected"})))
@@ -104,7 +112,7 @@
   "I don't do a whole lot."
   [& args]
   (let [server1-conn {:pool {} :spec {:uri "redis://redis:6379"}}
-        devices (atom {1 (Device. 1 99999 ["test/temp" "keyUp"] 40)})
+        devices (atom {1 (Device. 1 99999 ["smuggler_00002"] 40)})
         redis-sub (chan)
         mqtt-sub (chan)
         mqtt-pub (chan)

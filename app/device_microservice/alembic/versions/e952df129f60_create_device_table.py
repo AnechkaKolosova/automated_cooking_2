@@ -23,10 +23,6 @@ def upgrade():
         sa.Column('status', sa.String(20), nullable=False),
         sa.Column('description', sa.String(200)),
         sa.Column('user', sa.Integer),
-        sa.Column('connected', sa.Boolean),
-        sa.Column('targetTemp', sa.Float, nullable=True),
-        sa.Column('timestamp', sa.Integer, nullable=True),
-        sa.Column('time', sa.Integer, nullable=True)
     )
 
 
