@@ -12,11 +12,11 @@ from device_statistics.models import Metric
 def redis_get_device_info():
     r = redis.StrictRedis(host='redis', port=6379)  # Connect to local Redis instance
     try:
-
-        if r.get("running"):
-            return
-        else:
-            r.set("running", "true")
+        #
+        # if r.get("running"):
+        #     return
+        # else:
+        #     r.set("running", "true")
         p = r.pubsub()
         p.subscribe('sous-vide')
 
@@ -31,9 +31,14 @@ def redis_get_device_info():
                 user = redis_msg.get('user', None)
                 device = redis_msg.get("device", None)
                 if msg_type is not None and msg_type == "show_temp" and user is not None and device is not None:
-                    Metric.objects.create(device=device, user_id=user, temp=redis_msg["temp"],
-                                          longitude=redis_msg["longitude"], latitude=redis_msg["latitude"],
-                                          photo=redis_msg["photo"], humidity=redis_msg["humidity"], type=msg_type)
+                    if redis_msg["latitude"] == "" or redis_msg["longitude"] == "":
+                        Metric.objects.create(device=device, user_id=user, temp=redis_msg["temp"],
+                                              photo=redis_msg["photo"], humidity=redis_msg["humidity"], type=msg_type)
+
+                    else:
+                        Metric.objects.create(device=device, user_id=user, temp=redis_msg["temp"],
+                                              longitude=redis_msg["longitude"], latitude=redis_msg["latitude"],
+                                              photo=redis_msg["photo"], humidity=redis_msg["humidity"], type=msg_type)
 
             time.sleep(1)
 

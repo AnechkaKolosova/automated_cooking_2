@@ -58,14 +58,12 @@ export class DeviceStatisticsComponent implements OnInit, OnDestroy {
             datasets: [
               {
                 label: 'temperature',
-                yAxisID: 'temperature',
                 data: this.temp,
                 borderColor: '#44ba3c',
                 fill: false
               },
               {
                 label: 'humidity',
-                yAxisID: 'humidity',
                 data: this.hum,
                 borderColor: '#4d81ba',
                 fill: false
@@ -81,27 +79,14 @@ export class DeviceStatisticsComponent implements OnInit, OnDestroy {
                 display: true
               }],
               yAxes: [{
-                id: 'temperature',
-                type: 'linear',
-                position: 'left',
                 display: true
-              },
-                {
-                  id: 'humidity',
-                  type: 'linear',
-                  position: 'right',
-                  ticks: {
-                    max: 1,
-                    min: 0
-                  },
-                  display: true
-                }],
+              }],
             }
           }
         });
       });
     });
-    this.subscription = interval(10000).pipe(switchMap(() => this.statService.getLatestStat())).subscribe(metrics => {
+    this.subscription = interval(30000).pipe(switchMap(() => this.statService.getLatestStat())).subscribe(metrics => {
       const metric = metrics[0];
       if (metric) {
         if (this.time.length > 20) {
@@ -116,6 +101,8 @@ export class DeviceStatisticsComponent implements OnInit, OnDestroy {
         if (this.time[this.time.length - 1] !== new Date(metric.dt)) {
           this.time.push(new Date(metric.dt).getMinutes());
         }
+        this.temp.push(metric.temp);
+        this.hum.push(metric.humidity);
         this.chart.update();
       }
     });

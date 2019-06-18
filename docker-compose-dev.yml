@@ -14,7 +14,7 @@ services:
     working_dir: /app
     volumes:
       - "./app/frontend:/app"
-    command: /bin/sh -c "npm install && npm install -g @angular/cli && ng serve --host 0.0.0.0 --disable-host-check"
+    command: /bin/sh -c "npm install && npm install -g @angular/cli && ng serve --host 0.0.0.0 --port 4201 --disable-host-check"
     ports:
       - "4201:4201"
 
@@ -39,7 +39,7 @@ services:
     working_dir: /app
     volumes:
       - "./app/device_microservice:/app"
-    command: /bin/sh -c "pip install -r requirements.txt && alembic upgrade head && gunicorn --reload -b 0.0.0.0:8080 main:app -w 4 -k uvicorn.workers.UvicornH11Worker"
+    command: /bin/sh -c "pip install -r requirements.txt && alembic upgrade head && gunicorn --reload -b 0.0.0.0:8081 main:app -w 4 -k uvicorn.workers.UvicornH11Worker"
 #    command: /bin/sh -c "pip install -r requirements.txt && alembic upgrade head && uvicorn main:app"
     environment:
       - 'REDIS_HOST=redis'

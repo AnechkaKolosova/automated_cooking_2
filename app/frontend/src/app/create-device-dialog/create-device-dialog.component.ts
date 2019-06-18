@@ -18,7 +18,6 @@ export class CreateDeviceDialogComponent implements OnInit, OnDestroy {
   newDevice: FormGroup;
   submitted = false;
   savedDevice?: Device;
-  subscription: Subscription;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -57,7 +56,6 @@ export class CreateDeviceDialogComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.subscription.unsubscribe();
   }
 
 }

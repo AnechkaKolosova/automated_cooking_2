@@ -4,4 +4,4 @@ pip3 install -r requirements.txt
 python3 manage.py makemigrations
 python3 manage.py migrate
 python3 manage.py process_tasks &
-python3 manage.py runserver 0.0.0.0:3000
+python3 manage.py runserver 0.0.0.0:3001

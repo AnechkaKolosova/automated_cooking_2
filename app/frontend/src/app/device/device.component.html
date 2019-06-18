@@ -18,10 +18,6 @@
     <ng-template #Nolng>
       <mat-card-subtitle>Longitude: Loading</mat-card-subtitle>
     </ng-template>
-    <mat-card-subtitle *ngIf="device.photo; else Nophoto">Longitude: {{device.photo}}</mat-card-subtitle>
-    <ng-template #Nophoto>
-      <mat-card-subtitle>Photo: Loading</mat-card-subtitle>
-    </ng-template>
   </mat-card-header>
   <img mat-card-image src="https://images-na.ssl-images-amazon.com/images/I/71hofVizeEL._SX425_.jpg"
        alt="Photo of a sous-vide">
@@ -29,5 +25,8 @@
     <p>
       {{device.description}}
     </p>
+    <div>
+      <p>{{device.photo}}</p>
+    </div>
   </mat-card-content>
 </mat-card>

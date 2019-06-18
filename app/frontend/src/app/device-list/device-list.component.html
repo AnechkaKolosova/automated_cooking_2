@@ -1,5 +1,5 @@
 <mat-grid-list cols="2" rowHeight="380" gutterSize="20px">
-  <mat-grid-tile *ngFor="let device of devices" rowspan="2">
+  <mat-grid-tile *ngFor="let device of devices" rowspan="2" colspan="2">
     <app-device [device]="device"></app-device>
   </mat-grid-tile>
 </mat-grid-list>
